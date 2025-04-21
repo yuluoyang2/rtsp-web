@@ -1,4 +1,3 @@
-const Stream = require('node-rtsp-stream');
 const express = require("express");
 const expressWebSocket = require("express-ws");
 const ffmpeg = require("fluent-ffmpeg");
@@ -61,6 +60,7 @@ app.listen(rtspServerPort, () => {
 });
 
 // RTSP 软游技术 WebSocket 播放
+const Stream = require('node-rtsp-stream');
 new Stream({
     name: 'socket',
     streamUrl: rtspUrl,
@@ -68,7 +68,8 @@ new Stream({
     ffmpegOptions: {
         '-stats': '',
         '-r': 20,
-        '-s': '1280x720'
+        '-s': '1280x720',
+        '-an': '' //  禁用音频
     }
 });
 
@@ -207,4 +208,34 @@ convertRtspToM3u8();
 // 启动 M3U8 服务
 m3u8app.listen(m3u8Port, () => {
     console.log(`M3U8 服务运行在 http://localhost:${m3u8Port}`);
+});
+//抓取快照功能
+const captureApp = new express();
+captureApp.use(cors());
+const { v4: uuidv4 } = require('uuid');
+captureApp.get('/capture-snapshot', (req, res) => {
+    const snapshotId = uuidv4();
+    const snapshotPath = `${snapshotId}.jpg`;
+    const snapshotCommand = `"D:/software/ffmpeg-7.0.2-full_build/bin/ffmpeg.exe" -i ${rtspUrl} -vframes 1 ${snapshotPath}`;
+
+    exec(snapshotCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`执行命令时出错: ${error.message}`);
+            res.status(500).send('截取快照失败');
+            return;
+        } 
+        if (stderr) {
+            console.log(`命令执行过程中的错误信息: ${stderr}`);
+        }
+        res.sendFile(snapshotPath, { root: __dirname }, (err) => {
+            if (err) {
+                console.error('发送快照文件出错:', err);
+                res.status(500).send('无法提供快照文件');
+            }
+        });
+    });
+});
+const port = 3001;
+captureApp.listen(port, () => {
+    console.log(`Capture 服务运行在 http://localhost:${port}`);
 });
