@@ -1,0 +1,213 @@
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: #333;
+  background-color: #f8f9fa;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+#root {
+  width: 100%;
+}
+
+a {
+  font-weight: 500;
+  color: #007bff;
+  text-decoration: inherit;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #0056b3;
+}
+
+h1 {
+  text-align: center;
+  font-size: 3.2em;
+  line-height: 1.1;
+  margin-bottom: 0.5em;
+  color: #007bff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  width: 100%;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+  border-color: #0056b3;
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+      color: #213547;
+      background-color: #ffffff;
+  }
+  a:hover {
+      color: #747bff;
+  }
+  button {
+      background-color: #f9f9f9;
+  }
+  button:hover {
+      background-color: #eaeaea;
+  }
+}
+
+/* 播放器容器样式 */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* 切换播放器按钮样式 */
+.switch-buttons {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.switch-buttons button {
+  margin: 0;
+}
+
+.switch-buttons .active {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.4);
+}
+
+/* 播放器盒子 */
+.player-wrapper {
+  border: none;
+  border-radius: 16px;
+  padding: 24px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.player-wrapper:hover {
+  transform: scale(1.02);
+}
+
+/* 控制按钮区域 */
+.controls {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.controls button {
+  margin-right: 0;
+}
+
+.controls label {
+  margin: 0;
+}
+
+.monitoring-container {
+  padding: 20px 20px 10px;
+  font-family: 'Inter', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+.video-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.top-row {
+  display: flex;
+  gap: 30px;
+  width: 100%;
+}
+
+.top-row .video-box {
+  flex: 1;
+}
+
+.bottom-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.bottom-row .video-box {
+  width: calc(50% - 15px);
+}
+
+.video-box {
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 123, 255, 0.2);
+  border-color: #007bff;
+}
+
+.video-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.video-player {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: black;
+  border-radius: 8px;
+  overflow: hidden;
+}    
