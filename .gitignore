@@ -1,5 +1,5 @@
 node_modules
 *.m3u8
 *.ts
-/server/hls
 *.jpg
+*.mp4
