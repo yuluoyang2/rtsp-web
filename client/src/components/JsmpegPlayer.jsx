@@ -37,7 +37,7 @@ export default function JsmpegPlayer() {
         <div id="video" style={{ width: 640, height: 360 }}></div>
       </div>
       <br />
-      <button onClick={handleSnapshot}>截取快照</button>
+      <button onClick={handleSnapshot} className="button">截取快照</button>
     </div>
   );
 }

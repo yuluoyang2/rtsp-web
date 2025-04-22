@@ -39,3 +39,7 @@ h1, h2 {
   width: 50%; /* 调整 JsmpegPlayer 宽度 */
   margin: 0 auto;
 }
+.button {
+  background-color: #007bff;
+  color: white;
+}
