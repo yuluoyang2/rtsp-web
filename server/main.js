@@ -72,6 +72,8 @@ new Stream({
         '-an': '' //  禁用音频
     }
 });
+// 将 FFmpeg 路径定义为常量
+const FFMPEG_PATH = "D:/software/ffmpeg-7.0.2-full_build/bin/ffmpeg.exe";
 
 // NodeMediaServer 
 const nmsConfig = {
@@ -89,7 +91,7 @@ const nmsConfig = {
     },
     trans: {
         // 使用双反斜杠表示路径
-        ffmpeg: "D:/software/ffmpeg-7.0.2-full_build/bin/ffmpeg.exe",
+        ffmpeg: FFMPEG_PATH,
         tasks: [
             {
                 app: 'live',
@@ -110,7 +112,7 @@ nms.run();
 console.log("NodeMediaServer running with HLS support on port 8099");
 
 // 自动拉流并推送到 RTMP
-const ffmpegCmd = `"D:/software/ffmpeg-7.0.2-full_build/bin/ffmpeg.exe" -rtsp_transport tcp -i ${rtspUrl} -c:v copy -c:a copy -f flv rtmp://localhost:9997/live/mystream`;
+const ffmpegCmd = `${FFMPEG_PATH} -rtsp_transport tcp -i ${rtspUrl} -c:v copy -c:a copy -f flv rtmp://localhost:9997/live/mystream`;
 
 exec(ffmpegCmd, (error, stdout, stderr) => {
     if (error) {
@@ -226,7 +228,7 @@ const { v4: uuidv4 } = require('uuid');
 captureApp.get('/capture-snapshot', (req, res) => {
     const snapshotId = uuidv4();
     const snapshotPath = `${snapshotId}.jpg`;
-    const snapshotCommand = `"D:/software/ffmpeg-7.0.2-full_build/bin/ffmpeg.exe" -i ${rtspUrl} -vframes 1 ${snapshotPath}`;
+    const snapshotCommand = `${FFMPEG_PATH} -i ${rtspUrl} -vframes 1 ${snapshotPath}`;
 
     exec(snapshotCommand, (error, stdout, stderr) => {
         if (error) {
@@ -257,7 +259,7 @@ captureApp.get('/save-rtsp', (req, res) => {
     }
 
     const saveFilePath = path.join(saveFolder, saveFileName);
-    const saveCommand = `"D:/software/ffmpeg-7.0.2-full_build/bin/ffmpeg.exe" -i ${rtspUrl} -t 10 -c copy ${saveFilePath}`;
+    const saveCommand = `${FFMPEG_PATH} -i ${rtspUrl} -t 10 -c copy ${saveFilePath}`;
 
     exec(saveCommand, (error, stdout, stderr) => {
         if (error) {
