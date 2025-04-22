@@ -3,7 +3,78 @@
 ## Rtsp协议介绍
 >RTSP(Real-Time Stream Protocol)协议是一个基于文本的多媒体播放控制协议，属于应用层。RTSP以客户端方式工作，对流媒体提供播放、暂停、后退、前进等操作。该标准由IETF指定，对应的协议是RFC2326。RTSP作为一个应用层协议，提供了一个可供扩展的框架，使得流媒体的受控和点播变得可能，它主要用来控制具有实时特性的数据的发送，但其本身并不用于传送流媒体数据，而必须依赖下层传输协议(如RTP/RTCP)所提供的服务来完成流媒体数据的传送。RTSP负责定义具体的控制信息、操作方法、状态码，以及描述与RTP之间的交互操作。
 ## 系统架构图
-以后再添加
+
+```mermaid
+graph TD
+    subgraph 客户端
+        A[React前端应用] --> B1[JSMpeg播放器]
+        A --> B2[Flv.js播放器1]
+        A --> B3[Flv.js播放器2]
+        A --> B4[HLS播放器1]
+        A --> B5[HLS播放器2]
+        A --> B6[监控视频面板]
+    end
+
+    subgraph 服务器端
+        C[RTSP流源] --> D[Node.js服务器]
+        D --> E1[RTSP转WebSocket-FLV]
+        D --> E2[RTSP转WebSocket-JSMpeg]
+        D --> E3[RTSP转HLS]
+        D --> E4[NodeMediaServer]
+        E4 --> F1[RTMP服务]
+        E4 --> F2[HLS服务]
+        E4 --> F3[HTTP-FLV服务]
+        D --> G[截图和录制服务]
+    end
+
+    E1 --> B2
+    E2 --> B1
+    E3 --> B5
+    F2 --> B4
+    F3 --> B3
+    E1 --> B6
+    E2 --> B6
+    F2 --> B6
+    F3 --> B6
+    E3 --> B6
+```
+
+## 数据流程图
+
+```mermaid
+sequenceDiagram
+    participant RTSP as RTSP流源
+    participant Server as Node.js服务器
+    participant FFmpeg as FFmpeg转码
+    participant NMS as NodeMediaServer
+    participant Client as Web客户端
+
+    RTSP->>Server: 提供RTSP视频流
+    Server->>FFmpeg: 请求转码
+    FFmpeg->>Server: 转换为WebSocket-FLV流
+    FFmpeg->>Server: 转换为WebSocket-JSMpeg流
+    FFmpeg->>Server: 转换为HLS流
+    Server->>NMS: 推送RTMP流
+    NMS->>NMS: 内部转换为HLS和HTTP-FLV
+
+    Client->>Server: 请求视频流
+    Server->>Client: 提供WebSocket-FLV流
+    Server->>Client: 提供WebSocket-JSMpeg流
+    Server->>Client: 提供HLS流
+    NMS->>Client: 提供NodeMediaServer的HLS流
+    NMS->>Client: 提供HTTP-FLV流
+
+    Client->>Server: 请求截图
+    Server->>FFmpeg: 执行截图命令
+    FFmpeg->>Server: 返回截图文件
+    Server->>Client: 发送截图文件
+
+    Client->>Server: 请求录制
+    Server->>FFmpeg: 执行录制命令
+    FFmpeg->>Server: 保存录制文件
+    Server->>Client: 确认录制完成
+```
+
 ## 功能特性
 * 把Rtsp视频流实时转换为Web可以播放的格式
 * 支持多播放器选择，如flv.js、hls.js、JSMpeg
@@ -20,7 +91,7 @@
 * vite
 ### 后端
 * Node.js
-* Express 
+* Express
 * Express-ws
 * FFmpeg
 * node-media-server
@@ -44,17 +115,15 @@
     npm install
     npm run dev
     ```
-5. 若 **node-media-server** 出现bug,则添加以下代码
-    ```javascript
-    let version = '7.0.2';
-    ```
 ## 配置说明
-    ```javascript
-    const FFMPEG_PATH = "路径/到/ffmpeg"; // 修改为你的 FFmpeg 可执行文件路径
-    ```
-    ```javascript
-    const rtspUrl = 'rtsp://localhost:8554/mystream'; // 修改为你的 RTSP 流地址
-    ```
+
+```javascript
+const FFMPEG_PATH = "路径/到/ffmpeg"; // 修改为你的 FFmpeg 可执行文件路径
+```
+
+```javascript
+const rtspUrl = 'rtsp://localhost:8554/mystream'; // 修改为你的 RTSP 流地址
+```
 ## 端口使用说明
 * 9997:RTMP 服务器
 * 9998:RTSP 转 WebSocket (FLV)
@@ -80,42 +149,40 @@
 
 ## 目录结构
     /
-    ├── client/                   
+    ├── client/
     │   ├── src/
     |   |   |—— components/         # React 组件
     |   |   |     |—— FlvPlayer1.jsx
-    |   |   |     |—— FlvPlayer2.jsx    
+    |   |   |     |—— FlvPlayer2.jsx
     |   |   |     |—— HlsPlayer1.jsx
-    |   |   |     |—— HlsPlayer2.jsx 
+    |   |   |     |—— HlsPlayer2.jsx
     |   |   |     |—— index.css     # 组件样式表
     |   |   |     |—— JsmpegPlayer.jsx
-    |   |   │     └── MonitoringPanel.jsx 
+    |   |   │     └── MonitoringPanel.jsx
     |   |   |—— other/              # 保存暂时不用的代码
     |   │   |── public/             # 暂时无用
     |   │   |── index.css           # 全局的css样式
     |   │   └── main.jsx            # React 应用入口
     │   ├── index.html              # 前端入口 HTML
-    │   ├── package-lock.json    
+    │   ├── package-lock.json
     │   |── package.json            # 前端打包
     │   └── vite.config.js          # vite配置
-    |   
-    ├── server/        
+    |
+    ├── server/
     │   ├── hls/                    # HLS 分片存储目录
-    │   ├── media/                  
+    │   ├── media/
     |   │   └── live/
     |   │       └── mystream/       # NodeMediaServer 媒体文件存储
     │   ├── public/                 # 暂时无用
     │   ├── rtspsave/               # 录制的视频存储目录
     │   ├── main.js                 # 主服务器文件
-    │   ├── package-lock.json    
-    │   └── package.json            # 后端打包      
-    ├── .gitignore             
-    ├── package-lock.json             
-    ├── package.json                # 总的打包        
-    └── readme.md    
+    │   ├── package-lock.json
+    │   └── package.json            # 后端打包
+    ├── .gitignore
+    ├── package-lock.json
+    ├── package.json                # 总的打包
+    └── readme.md
 
 ## 联系方式
-* 邮箱：一会再写
-
-      
-
+* 邮箱：rtsp-web@example.com
+* GitHub：https://github.com/yourusername/rtsp-web

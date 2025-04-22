@@ -1,0 +1,14 @@
+diff --git a/node_modules/node-media-server/src/node_trans_server.js b/node_modules/node-media-server/src/node_trans_server.js
+index d5aca14..57baf79 100644
+--- a/node_modules/node-media-server/src/node_trans_server.js
++++ b/node_modules/node-media-server/src/node_trans_server.js
+@@ -12,6 +12,9 @@ const fs = require('fs');
+ const _ = require('lodash');
+ const mkdirp = require('mkdirp');
+ 
++// 修复版本变量未定义的问题
++const version = '7.0.2';
++
+ class NodeTransServer {
+   constructor(config) {
+     this.config = config;
