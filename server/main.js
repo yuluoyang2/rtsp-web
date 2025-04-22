@@ -124,16 +124,30 @@ exec(ffmpegCmd, (error, stdout, stderr) => {
     console.log(`FFmpeg 输出: ${stdout}`);
 });
 
+
+
+// 新增：RTSP 转 M3U8 并提供服务
+const m3u8Port = 3000;
+//const m3u8Path = 'stream.m3u8';
+const m3u8File = 'stream.m3u8';
+const m3u8Folder = path.join(__dirname, 'hls');
+// 如果 hls 目录不存在，先创建
+if (!fs.existsSync(m3u8Folder)) {
+    fs.mkdirSync(m3u8Folder, { recursive: true });
+}
+
+const m3u8Path = path.join(m3u8Folder, m3u8File);
+
 // 删除原来的 .ts 和 .m3u8 文件
 function deleteOldFiles() {
-    fs.readdir(__dirname, (err, files) => {
+    fs.readdir(m3u8Folder, (err, files) => {
         if (err) {
             console.error('读取目录出错:', err);
             return;
         }
         files.forEach((file) => {
             if (file.endsWith('.ts') || file.endsWith('.m3u8')) {
-                const filePath = path.join(__dirname, file);
+                const filePath = path.join(m3u8Folder, file);
                 fs.unlink(filePath, (err) => {
                     if (err) {
                         console.error('删除文件出错:', err);
@@ -145,10 +159,6 @@ function deleteOldFiles() {
         });
     });
 }
-
-// 新增：RTSP 转 M3U8 并提供服务
-const m3u8Port = 3000;
-const m3u8Path = 'stream.m3u8';
 
 // 启动 FFmpeg 进行 RTSP 到 M3U8 的转换
 const convertRtspToM3u8 = () => {
@@ -177,7 +187,7 @@ const convertRtspToM3u8 = () => {
 const m3u8app = new express();
 m3u8app.use(cors())
 m3u8app.get('/stream.m3u8', (req, res) => {
-    res.sendFile(m3u8Path, { root: __dirname }, (err) => {
+    res.sendFile(m3u8Path,  (err) => {
         if (err) {
             console.error('发送 M3U8 文件出错:', err);
             res.status(500).send('无法提供 M3U8 文件');
@@ -189,7 +199,7 @@ m3u8app.get('/:filename.ts', (req, res) => {
     // 从请求参数中获取文件名，并添加 .ts 扩展名
     const filename = req.params.filename + '.ts';
     // 发送文件给客户端
-    res.sendFile(filename, { root: __dirname }, (err) => {
+    res.sendFile(filename, {root :m3u8Folder}, (err) => {
         // 若发送文件时出现错误
         if (err) {
             // 记录错误日志
@@ -231,6 +241,37 @@ captureApp.get('/capture-snapshot', (req, res) => {
             if (err) {
                 console.error('发送快照文件出错:', err);
                 res.status(500).send('无法提供快照文件');
+            }
+        });
+    });
+});
+// 保存 RTSP 流到本地的路由
+captureApp.get('/save-rtsp', (req, res) => {
+    const saveRtspId = uuidv4();
+    const saveFileName = `${saveRtspId}.mp4`;
+    const saveFolder = path.join(__dirname, 'rtspSave');
+
+    // 检查文件夹是否存在，如果不存在则创建
+    if (!fs.existsSync(saveFolder)) {
+        fs.mkdirSync(saveFolder, { recursive: true });
+    }
+
+    const saveFilePath = path.join(saveFolder, saveFileName);
+    const saveCommand = `"D:/software/ffmpeg-7.0.2-full_build/bin/ffmpeg.exe" -i ${rtspUrl} -t 10 -c copy ${saveFilePath}`;
+
+    exec(saveCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`执行命令时出错: ${error.message}`);
+            res.status(500).send('保存 RTSP 流失败');
+            return;
+        }
+        if (stderr) {
+            console.log(`命令执行过程中的错误信息: ${stderr}`);
+        }
+        res.sendFile(saveFilePath,  (err) => {
+            if (err) {
+                console.error('发送视频文件出错:', err);
+                res.status(500).send('无法提供视频文件');
             }
         });
     });

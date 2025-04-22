@@ -158,7 +158,7 @@ function MonitoringPanel() {
                 </div>
                 <div className="bottom-row">
                     <div className="video-box">
-                        <h3>新增 HLS 播放器</h3>
+                        <h3>HLS 播放器 2</h3>
                         <video
                             ref={additionalHlsVideoRef}
                             controls

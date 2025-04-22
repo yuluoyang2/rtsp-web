@@ -30,6 +30,23 @@ export default function JsmpegPlayer() {
         alert(`请求出错: ${error.message}`);
     }
   };
+  const handleSaveRTSP = async () => {
+    try {
+      alert("正在截取当前10s的RTSP流");
+  
+      const response = await fetch("http://localhost:3001/save-rtsp");
+  
+      if (response.ok) {
+        alert("已经保存到本地文件夹rtspSave");
+      } else {
+        const errorText = await response.text();
+        alert(`保存失败: ${errorText}`);
+      }
+    } catch (error) {
+      alert(`请求出错: ${error.message}`);
+    }
+  };
+  
   return (
     <div className="container">
       <h1>Jsmpeg Player</h1>
@@ -38,6 +55,8 @@ export default function JsmpegPlayer() {
       </div>
       <br />
       <button onClick={handleSnapshot} className="button">截取快照</button>
+      <br />
+      <button onClick={handleSaveRTSP} className="button">保存 RTSP 流到本地</button>
     </div>
   );
 }
