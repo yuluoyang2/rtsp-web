@@ -247,3 +247,7 @@ button:focus-visible {
   background-color: lightblue;
   color: white;
 }
+.dash-button{
+  background-color: gold;
+  color: black;
+}

@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from'react';
 import JSMpeg from "@cycjimmy/jsmpeg-player";
 import flvjs from 'flv.js';
 import Hls from 'hls.js';
+import dashjs from 'dashjs'; // 引入 dashjs 库
 import '../index.css';
 
 function MonitoringPanel() {
@@ -10,12 +11,14 @@ function MonitoringPanel() {
     const hlsVideoRef = useRef(null);
     const flvVideoRef2 = useRef(null);
     const additionalHlsVideoRef = useRef(null);
+    const dashVideoRef = useRef(null); // 新增 DASH 视频元素的 ref
 
     const jsmpegPlayerRef = useRef(null);
     const flvPlayerRef = useRef(null);
     const hlsInstanceRef = useRef(null);
     const flvPlayerRef2 = useRef(null);
     const additionalHlsInstanceRef = useRef(null);
+    const dashPlayerRef = useRef(null); // 新增 DASH 播放器实例的 ref
 
     useEffect(() => {
         // 初始化 JSMpeg 播放器
@@ -89,12 +92,18 @@ function MonitoringPanel() {
             });
         }
 
+        // 初始化 DASH 播放器
+        const dashPlayer = dashjs.MediaPlayer().create();
+        dashPlayer.initialize(dashVideoRef.current, "http://localhost:8099/live/mystream/index.mpd", true);
+        dashPlayerRef.current = dashPlayer;
+
         return () => {
             // 暂停视频元素
             if (flvVideoRef.current) flvVideoRef.current.pause();
             if (hlsVideoRef.current) hlsVideoRef.current.pause();
             if (flvVideoRef2.current) flvVideoRef2.current.pause();
             if (additionalHlsVideoRef.current) additionalHlsVideoRef.current.pause();
+            if (dashVideoRef.current) dashVideoRef.current.pause(); // 暂停 DASH 视频
 
             // 销毁播放器实例
             if (jsmpegPlayerRef.current) {
@@ -121,6 +130,10 @@ function MonitoringPanel() {
                 additionalHlsInstanceRef.current.destroy();
                 additionalHlsInstanceRef.current = null;
             }
+            if (dashPlayerRef.current) {
+                dashPlayerRef.current.destroy();
+                dashPlayerRef.current = null;
+            } // 销毁 DASH 播放器实例
         };
     }, []);
 
@@ -165,9 +178,18 @@ function MonitoringPanel() {
                             className="video-player"
                         />
                     </div>
+                    <div className="video-box">
+                        <h3>DASH 播放器</h3>
+                        <video
+                            ref={dashVideoRef}
+                            controls
+                            className="video-player"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
     );
-}    
+}
+
 export default MonitoringPanel;

@@ -75,7 +75,7 @@ function startRtspWebSocketJsmpeg() {
 // 将 FFmpeg 路径定义为常量
 const FFMPEG_PATH = "D:/software/ffmpeg-7.0.2-full_build/bin/ffmpeg.exe";
 
-// NodeMediaServer RTSP转RTMP 生成HTTP-FLV和HLS
+// NodeMediaServer RTSP转RTMP 生成HTTP-FLV和HLS和DASH
 function startNodeMediaServer() {
     const nmsConfig = {
         rtmp: {
@@ -99,7 +99,7 @@ function startNodeMediaServer() {
                     vc: 'libx264',
                     hls: true,
                     hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
-                    dash: false,
+                    dash: true,
                     dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
                 }
             ]
