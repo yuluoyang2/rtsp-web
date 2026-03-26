@@ -119,5 +119,4 @@ const rtspUrl = 'rtsp://localhost:8554/mystream'; // 修改为你的 RTSP 流地
     └── readme.md
 
 ## 联系方式
-* 邮箱：rtsp-web@example.com
-* GitHub：https://github.com/yourusername/rtsp-web
+
